@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import itertools
 import sympy as sym
 from rustworkx.visualization import graphviz_draw
@@ -267,3 +264,18 @@ def starMatroid(n):
             m.I.add(frozenset({0,i,j}))
     return m
 
+def linearMatroid(mat):
+    m,n = sym.shape(mat)
+    groundSet = set(range(0,n))
+    allSubsets = set()
+    for i in range(1,n+1):
+        allSubsets = allSubsets.union(set([frozenset(i) for i in itertools.combinations(groundSet,i) if 0 < len(i) <= m]))
+    print(allSubsets)
+    independentSets = set({frozenset({})})
+    for subset in allSubsets:
+        vectors = [list(mat.col(i)) for i in subset]
+        vectors = sym.Matrix(vectors)
+        print(vectors,vectors.rank())
+        if vectors.rank() == len(subset):
+            independentSets = independentSets.union({subset})
+    return AbstractMatroid(groundSet,independentSets.union({frozenset({})}))
